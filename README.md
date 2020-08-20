@@ -18,6 +18,7 @@
 >   ![](img/MejoradecpuvisualVM.png)
 >
 >3. Para controlar el maximo del queue lo que hicimos fue que el tamaño de la cola no exceda el atributo Stock-Limit
+>
 >   ![](img/LimiteMaximo.png)
 >
 >Ademas verificamos que el consumo de la cpu no se afectara 
