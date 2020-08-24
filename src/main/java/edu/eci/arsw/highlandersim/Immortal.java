@@ -16,6 +16,7 @@ public class Immortal extends Thread {
     private final String name;
 
     private final Random r = new Random(System.currentTimeMillis());
+    private boolean enCurso;
 
 
     public Immortal(String name, List<Immortal> immortalsPopulation, int health, int defaultDamageValue, ImmortalUpdateReportCallback ucb) {
@@ -25,34 +26,46 @@ public class Immortal extends Thread {
         this.immortalsPopulation = immortalsPopulation;
         this.health = health;
         this.defaultDamageValue=defaultDamageValue;
+        enCurso = true;
     }
 
     public void run() {
 
-        while (true) {
+        while (getHealth() > 0 ) {
+            while (!enCurso) {
+                synchronized (this) {
+                    try {
+                        this.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
             Immortal im;
+            synchronized (immortalsPopulation){
+                int myIndex = immortalsPopulation.indexOf(this);
 
-            int myIndex = immortalsPopulation.indexOf(this);
+                int nextFighterIndex = r.nextInt(immortalsPopulation.size());
 
-            int nextFighterIndex = r.nextInt(immortalsPopulation.size());
+                //avoid self-fight
+                if (nextFighterIndex == myIndex) {
+                    nextFighterIndex = ((nextFighterIndex + 1) % immortalsPopulation.size());
+                }
 
-            //avoid self-fight
-            if (nextFighterIndex == myIndex) {
-                nextFighterIndex = ((nextFighterIndex + 1) % immortalsPopulation.size());
+                im = immortalsPopulation.get(nextFighterIndex);
+                synchronized (im) {
+                    this.fight(im);
+                    im.notifyAll();
+                }
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-
-            im = immortalsPopulation.get(nextFighterIndex);
-
-            this.fight(im);
-
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
         }
-
     }
 
     public void fight(Immortal i2) {
@@ -80,5 +93,18 @@ public class Immortal extends Thread {
 
         return name + "[" + health + "]";
     }
+
+    public  void parar() {
+        enCurso = false;
+
+
+    }
+
+    public synchronized void renudar() {
+        enCurso = true;
+        this.notifyAll();
+    }
+
+
 
 }

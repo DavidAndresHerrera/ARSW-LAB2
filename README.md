@@ -24,3 +24,22 @@
 >Ademas verificamos que el consumo de la cpu no se afectara 
 >
 >   ![](img/10.png)
+>
+## Parte 2
+>
+>1. Review the “highlander-simulator” program, provided in the edu.eci.arsw.highlandersim package. This is a game in which:
+>
+>   - You have N immortal players. 
+>   - Each player knows the remaining N-1 player.
+>   - Each player permanently attacks some other immortal. The one who first attacks subtracts M life points from his opponent, and increases his own life points by the same amount. 
+>   - The game could never have a single winner. Most likely, in the end there are only two left, fighting indefinitely by removing and adding life points. 
+>2. Review the code and identify how the functionality indicated above was implemented. Given the intention of the game, an invariant should be that the sum of the life points of all players is always the same (of course, in an instant of time in which a time increase / reduction operation is not in process ). For this case, for N players, what should this value be?
+>
+>   - Debaria ser N*100 que es el numero de jugadores * la vida, Segun el codigo antes de modificar seria 300 el total 
+>3. Run the application and verify how the ‘pause and check’ option works. Is the invariant fulfilled?
+>   - La funcion pausa y check no esta bien ya que cada vez que se da click en la opcion se puede ver que el total de la vida de todos los inmortales da mas de lo que debe y por eso no se cumple el invariante
+>
+>   - ![](img/Inm1antesdemodi.png)
+>   - ![](img/Inm2antesdemodi.png)
+>
+>

@@ -91,15 +91,20 @@ public class ControlFrame extends JFrame {
                 /*
 				 * COMPLETAR
                  */
+
                 int sum = 0;
-                for (Immortal im : immortals) {
-                    sum += im.getHealth();
+                synchronized (immortals) {
+                    for (Immortal im : immortals) {
+                        im.parar();
+                    }
+                    for (Immortal im : immortals) {
+                        sum += im.getHealth();
+                    }
+                    immortals.notifyAll();
                 }
 
                 statisticsLabel.setText("<html>"+immortals.toString()+"<br>Health sum:"+ sum);
-                
-                
-
+                System.out.println("la vida es:  "+sum);
             }
         });
         toolBar.add(btnPauseAndCheck);
@@ -111,6 +116,13 @@ public class ControlFrame extends JFrame {
                 /**
                  * IMPLEMENTAR
                  */
+                synchronized (immortals) {
+                    for (Immortal im : immortals) {
+                        im.renudar();
+                        System.out.println(im.getId());
+                    }
+                    immortals.notifyAll();
+                }
 
             }
         });
