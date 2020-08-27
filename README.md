@@ -42,4 +42,21 @@
 >   - ![](img/Inm1antesdemodi.png)
 >   - ![](img/Inm2antesdemodi.png)
 >
+>10. Se corrigio este problema, eliminando los innmoratles que ya estan muertos, bien sea el que ataca
+>o el inmortal que es atacado, tambien ahora se realiza el bloqueo anidado, para mejorar el desempeño y no hacer
+>peleas innecesarias.
 >
+>   - ![](img/mejora.png)
+>  
+>Tambien se cambio la lista de inmorates, a una lista concurrente que permite que las operaciones sobre la estrucutura
+>de datos se hagan de manera concurrente y no secuencial como se realizaban anteriormente.
+>
+>   - ![](img/listConcurrent.png)
+>En el metodo setUpInmortals se cambia tambien la estrucutura de datos ya que es alli donde se instancia.
+>
+>   - ![](img/listConcurrent1.png)
+>
+>Finalmente se implemento el boton stop y la funcionalidad del mismo, este boton termina la ejucion del programa
+>de la siguiente manera:
+
+>   - ![](img/stop.png)

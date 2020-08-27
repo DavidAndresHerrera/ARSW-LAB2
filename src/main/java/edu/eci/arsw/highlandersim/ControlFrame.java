@@ -1,5 +1,6 @@
 package edu.eci.arsw.highlandersim;
 
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.util.LinkedList;
@@ -20,6 +21,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import java.awt.Color;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JScrollBar;
 
 public class ControlFrame extends JFrame {
@@ -29,7 +31,7 @@ public class ControlFrame extends JFrame {
 
     private JPanel contentPane;
 
-    private List<Immortal> immortals;
+    private CopyOnWriteArrayList<Immortal> immortals;
 
     private JTextArea output;
     private JLabel statisticsLabel;
@@ -65,8 +67,13 @@ public class ControlFrame extends JFrame {
 
         JToolBar toolBar = new JToolBar();
         contentPane.add(toolBar, BorderLayout.NORTH);
-
+        JButton btnResume = new JButton("Resume");
         final JButton btnStart = new JButton("Start");
+        JButton btnPauseAndCheck = new JButton("Pause and check");
+        toolBar.add(btnPauseAndCheck);
+        toolBar.add(btnResume);
+        toolBar.add(btnStart);
+
         btnStart.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
@@ -82,34 +89,27 @@ public class ControlFrame extends JFrame {
 
             }
         });
-        toolBar.add(btnStart);
 
-        JButton btnPauseAndCheck = new JButton("Pause and check");
+
         btnPauseAndCheck.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                /*
-				 * COMPLETAR
-                 */
-
-                int sum = 0;
-                synchronized (immortals) {
-                    for (Immortal im : immortals) {
-                        im.parar();
-                    }
-                    for (Immortal im : immortals) {
-                        sum += im.getHealth();
-                    }
-                    immortals.notifyAll();
+                for (Immortal im : immortals) {
+                    im.parar();
                 }
 
-                statisticsLabel.setText("<html>"+immortals.toString()+"<br>Health sum:"+ sum);
-                System.out.println("la vida es:  "+sum);
+                int sum = 0;
+                for (Immortal im : immortals) {
+                    sum += im.getHealth();
+                }
+
+
+                statisticsLabel.setText("<html>" + immortals.toString() + "<br>Health sum:" + sum);
             }
         });
-        toolBar.add(btnPauseAndCheck);
 
-        JButton btnResume = new JButton("Resume");
+
+
 
         btnResume.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -119,7 +119,6 @@ public class ControlFrame extends JFrame {
                 synchronized (immortals) {
                     for (Immortal im : immortals) {
                         im.renudar();
-                        System.out.println(im.getId());
                     }
                     immortals.notifyAll();
                 }
@@ -127,10 +126,9 @@ public class ControlFrame extends JFrame {
             }
         });
 
-        toolBar.add(btnResume);
 
-        JLabel lblNumOfImmortals = new JLabel("num. of immortals:");
-        toolBar.add(lblNumOfImmortals);
+
+
 
         numOfImmortals = new JTextField();
         numOfImmortals.setText("3");
@@ -139,6 +137,14 @@ public class ControlFrame extends JFrame {
 
         JButton btnStop = new JButton("STOP");
         btnStop.setForeground(Color.RED);
+        btnStop.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                btnResume.setEnabled(false);
+                for (Immortal im : immortals) {
+                    im.stop();
+                }
+            }
+        });
         toolBar.add(btnStop);
 
         scrollPane = new JScrollPane();
@@ -147,24 +153,24 @@ public class ControlFrame extends JFrame {
         output = new JTextArea();
         output.setEditable(false);
         scrollPane.setViewportView(output);
-        
-        
+
+
         statisticsLabel = new JLabel("Immortals total health:");
         contentPane.add(statisticsLabel, BorderLayout.SOUTH);
 
     }
 
-    public List<Immortal> setupInmortals() {
+    public CopyOnWriteArrayList<Immortal> setupInmortals() {
 
-        ImmortalUpdateReportCallback ucb=new TextAreaUpdateReportCallback(output,scrollPane);
-        
+        ImmortalUpdateReportCallback ucb = new TextAreaUpdateReportCallback(output, scrollPane);
+
         try {
             int ni = Integer.parseInt(numOfImmortals.getText());
 
-            List<Immortal> il = new LinkedList<Immortal>();
+            CopyOnWriteArrayList<Immortal> il = new CopyOnWriteArrayList<>();
 
             for (int i = 0; i < ni; i++) {
-                Immortal i1 = new Immortal("im" + i, il, DEFAULT_IMMORTAL_HEALTH, DEFAULT_DAMAGE_VALUE,ucb);
+                Immortal i1 = new Immortal("im" + i, il, DEFAULT_IMMORTAL_HEALTH, DEFAULT_DAMAGE_VALUE, ucb);
                 il.add(i1);
             }
             return il;
@@ -177,29 +183,29 @@ public class ControlFrame extends JFrame {
 
 }
 
-class TextAreaUpdateReportCallback implements ImmortalUpdateReportCallback{
+class TextAreaUpdateReportCallback implements ImmortalUpdateReportCallback {
 
     JTextArea ta;
     JScrollPane jsp;
 
-    public TextAreaUpdateReportCallback(JTextArea ta,JScrollPane jsp) {
+    public TextAreaUpdateReportCallback(JTextArea ta, JScrollPane jsp) {
         this.ta = ta;
-        this.jsp=jsp;
-    }       
-    
+        this.jsp = jsp;
+    }
+
     @Override
     public void processReport(String report) {
         ta.append(report);
 
         //move scrollbar to the bottom
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                JScrollBar bar = jsp.getVerticalScrollBar();
-                bar.setValue(bar.getMaximum());
-            }
-        }
+                                                   public void run() {
+                                                       JScrollBar bar = jsp.getVerticalScrollBar();
+                                                       bar.setValue(bar.getMaximum());
+                                                   }
+                                               }
         );
 
     }
-    
+
 }
